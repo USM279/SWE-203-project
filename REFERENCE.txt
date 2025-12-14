@@ -1,0 +1,177 @@
+═══════════════════════════════════════════════════════════════
+    Quick Project Map - Task Manager App
+═══════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Entry Point                                               │
+└─────────────────────────────────────────────────────────────┘
+   📄 Program.cs
+      ├─→ ApplicationDbContext (Database setup)
+      ├─→ appsettings.json (Connection settings)
+      └─→ All Controllers (Routing)
+
+┌─────────────────────────────────────────────────────────────┐
+│ 2. Data Layer                                                │
+└─────────────────────────────────────────────────────────────┘
+   💾 ApplicationDbContext.cs
+      ├─→ Employee.cs (DbSet<Employee>)
+      ├─→ TaskItem.cs (DbSet<TaskItem>)
+      ├─→ app.db (SQLite Database)
+      └─→ Used by: All Controllers
+
+┌─────────────────────────────────────────────────────────────┐
+│ 3. Models                                                     │
+└─────────────────────────────────────────────────────────────┘
+   👤 Employee.cs
+      ├─→ AssignedTasks (Collection → TaskItem)
+      ├─→ Used in: ApplicationDbContext
+      ├─→ Used in: TaskItem (Foreign Key)
+      ├─→ Used in: EmployeesController
+      └─→ Used in: AccountController
+
+   ✅ TaskItem.cs
+      ├─→ AssignedToId (Foreign Key → Employee)
+      ├─→ AssignedTo (Navigation → Employee)
+      ├─→ Used in: ApplicationDbContext
+      └─→ Used in: TaskItemsController
+
+   📋 ViewModels.cs
+      ├─→ LoginViewModel
+      ├─→ RegisterViewModel
+      ├─→ ErrorViewModel
+      ├─→ Used in: AccountController
+      └─→ Used in: HomeController
+
+┌─────────────────────────────────────────────────────────────┐
+│ 4. Controllers                                                │
+└─────────────────────────────────────────────────────────────┘
+   🏠 HomeController.cs
+      ├─→ Index() → Views/Home/Index.cshtml
+      ├─→ Privacy() → Views/Home/Privacy.cshtml
+      ├─→ Error() → Views/Shared/Error.cshtml
+      └─→ Uses: ApplicationDbContext, ViewModels
+
+   🔐 AccountController.cs
+      ├─→ Login() GET/POST → Views/Account/Login.cshtml
+      ├─→ Register() GET/POST → Views/Account/Register.cshtml
+      ├─→ Logout() POST → Redirect to Home
+      ├─→ AccessDenied() → Views/Account/AccessDenied.cshtml
+      └─→ Uses: ApplicationDbContext, Employee, ViewModels
+
+   ✅ TaskItemsController.cs
+      ├─→ Index() → Views/TaskItems/Index.cshtml
+      ├─→ Details(id) → Views/TaskItems/Details.cshtml
+      ├─→ Create() GET/POST → Views/TaskItems/Create.cshtml
+      ├─→ Edit(id) GET/POST → Views/TaskItems/Edit.cshtml
+      ├─→ Delete(id) GET/POST → Views/TaskItems/Delete.cshtml
+      ├─→ CanAccessTask() (Helper)
+      ├─→ GetCurrentUserId() (Helper)
+      ├─→ PopulateEmployeesDropdown() (Helper)
+      └─→ Uses: ApplicationDbContext, TaskItem, Employee
+
+   👥 EmployeesController.cs
+      ├─→ Index() → Views/Employees/Index.cshtml
+      ├─→ Details(id) → Views/Employees/Details.cshtml
+      ├─→ Create() GET/POST → Views/Employees/Create.cshtml
+      ├─→ Edit(id) GET/POST → Views/Employees/Edit.cshtml
+      ├─→ Delete(id) GET/POST → Views/Employees/Delete.cshtml
+      ├─→ EmployeeExists(id) (Helper)
+      └─→ Uses: ApplicationDbContext, Employee, TaskItem
+
+┌─────────────────────────────────────────────────────────────┐
+│ 5. Views                                                      │
+└─────────────────────────────────────────────────────────────┘
+   📁 Views/Home/
+      ├─→ Index.cshtml (Dashboard)
+      └─→ Privacy.cshtml
+
+   📁 Views/Account/
+      ├─→ Login.cshtml
+      ├─→ Register.cshtml
+      └─→ AccessDenied.cshtml
+
+   📁 Views/TaskItems/
+      ├─→ Index.cshtml (Tasks list)
+      ├─→ Create.cshtml
+      ├─→ Edit.cshtml
+      ├─→ Details.cshtml
+      └─→ Delete.cshtml
+
+   📁 Views/Employees/
+      ├─→ Index.cshtml (Employees list)
+      ├─→ Create.cshtml
+      ├─→ Edit.cshtml
+      ├─→ Details.cshtml
+      └─→ Delete.cshtml
+
+   📁 Views/Shared/
+      ├─→ _Layout.cshtml (Main layout) ← All Views
+      ├─→ _ViewStart.cshtml
+      ├─→ _ViewImports.cshtml
+      └─→ Error.cshtml
+
+┌─────────────────────────────────────────────────────────────┐
+│ 6. Entity Relationships                                       │
+└─────────────────────────────────────────────────────────────┘
+   Employee (1) ────── (Many) TaskItem
+      │                      │
+      │                      │
+   AssignedTasks      AssignedToId (FK)
+   (Collection)       AssignedTo (Navigation)
+
+┌─────────────────────────────────────────────────────────────┐
+│ 7. Authorization System                                       │
+└─────────────────────────────────────────────────────────────┘
+   Admin:
+      ✅ Create/Edit/Delete all tasks
+      ✅ Create/Edit/Delete employees
+      ✅ View all tasks and employees
+      ✅ Reassign tasks
+
+   Employee:
+      ✅ View own tasks only
+      ✅ Update task status and notes
+      ❌ Cannot create or delete tasks
+      ❌ Cannot access employee management
+
+┌─────────────────────────────────────────────────────────────┐
+│ 8. Request Flow                                               │
+└─────────────────────────────────────────────────────────────┘
+   User
+      ↓
+   Browser (HTTP Request)
+      ↓
+   Program.cs (Routing)
+      ↓
+   Authentication Check
+      ↓
+   Controller (Action Method)
+      ↓
+   ApplicationDbContext (Query)
+      ↓
+   SQLite Database
+      ↓
+   ApplicationDbContext (Return Entities)
+      ↓
+   Controller (Pass to View)
+      ↓
+   View (Render HTML)
+      ↓
+   HTTP Response
+      ↓
+   User (Display Page)
+
+┌─────────────────────────────────────────────────────────────┐
+│ 9. Configuration Files                                         │
+└─────────────────────────────────────────────────────────────┘
+   📄 appsettings.json
+      └─→ ConnectionStrings → ApplicationDbContext
+
+   📄 TaskManagerApp.csproj
+      └─→ Dependencies (EF Core, SQLite)
+
+═══════════════════════════════════════════════════════════════
+   For more details:
+   - PROJECT_ARCHITECTURE_EN.md (Detailed diagram)
+   - PROJECT_MAP_EN.html (Interactive diagram - open in browser)
+═══════════════════════════════════════════════════════════════

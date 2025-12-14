@@ -1,0 +1,208 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4"> Task Manager System</h1>
+    <p class="lead">Efficient task management for your team</p>
+</div>
+
+@if (User.Identity?.IsAuthenticated ?? false)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3>Welcome back, @User.Identity.Name! 👋</h3>
+            <p class="text-muted">Here's an overview of your workspace</p>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card border-primary h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Total Employees</h6>
+                        <h2 class="card-title text-primary">@ViewBag.TotalEmployees</h2>
+                        <a asp-controller="Employees" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">View All</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card stat-card border-info h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Total Tasks</h6>
+                        <h2 class="card-title text-info">@ViewBag.TotalTasks</h2>
+                        <a asp-controller="TaskItems" asp-action="Index" class="btn btn-sm btn-outline-info mt-2">View All</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card stat-card border-success h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Completed Tasks</h6>
+                        <h2 class="card-title text-success">@ViewBag.CompletedTasks</h2>
+                        <small class="text-muted">@((ViewBag.TotalTasks > 0 ? (ViewBag.CompletedTasks * 100.0 / ViewBag.TotalTasks).ToString("F1") : "0"))% completion rate</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card stat-card border-danger h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Overdue Tasks</h6>
+                        <h2 class="card-title text-danger">@ViewBag.OverdueTasks</h2>
+                        @if (ViewBag.OverdueTasks > 0)
+                        {
+                            <small class="text-danger">Requires attention!</small>
+                        }
+                        else
+                        {
+                            <small class="text-success">All on track! ✓</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">🎯 Quick Actions</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a asp-controller="TaskItems" asp-action="Create" class="list-group-item list-group-item-action">
+                            ➕ Create New Task
+                        </a>
+                        <a asp-controller="Employees" asp-action="Create" class="list-group-item list-group-item-action">
+                            👤 Add New Employee
+                        </a>
+                        <a asp-controller="TaskItems" asp-action="Index" class="list-group-item list-group-item-action">
+                            📊 View All Tasks
+                        </a>
+                        <a asp-controller="Employees" asp-action="Index" class="list-group-item list-group-item-action">
+                            👥 Manage Employees
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">ℹ️ System Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Role:</strong> <span class="badge bg-danger">Administrator</span></p>
+                        <p><strong>Email:</strong> @User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</p>
+                        <p><strong>Position:</strong> @User.FindFirst("Position")?.Value</p>
+                        <hr>
+                        <p class="text-muted mb-0"><small>As an admin, you have full access to manage employees and tasks.</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card border-info h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">My Tasks</h6>
+                        <h2 class="card-title text-info">@ViewBag.MyTasks</h2>
+                        <a asp-controller="TaskItems" asp-action="Index" class="btn btn-sm btn-outline-info mt-2">View Tasks</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card stat-card border-success h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Completed</h6>
+                        <h2 class="card-title text-success">@ViewBag.MyCompletedTasks</h2>
+                        <small class="text-muted">@((ViewBag.MyTasks > 0 ? (ViewBag.MyCompletedTasks * 100.0 / ViewBag.MyTasks).ToString("F1") : "0"))% complete</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card stat-card border-warning h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Pending</h6>
+                        <h2 class="card-title text-warning">@ViewBag.MyPendingTasks</h2>
+                        <small class="text-muted">Tasks in progress</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card stat-card border-danger h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Overdue</h6>
+                        <h2 class="card-title text-danger">@ViewBag.MyOverdueTasks</h2>
+                        @if (ViewBag.MyOverdueTasks > 0)
+                        {
+                            <small class="text-danger">Needs attention!</small>
+                        }
+                        else
+                        {
+                            <small class="text-success">All on track! ✓</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">🎯 Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a asp-controller="TaskItems" asp-action="Index" class="btn btn-primary">📋 View My Tasks</a>
+                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" class="btn btn-info">👤 My Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-5">
+                    <h3 class="card-title">✨ Features</h3>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-3">✅ <strong>Task Management:</strong> Create, assign, and track tasks</li>
+                        <li class="mb-3">👥 <strong>Employee Management:</strong> Manage your team efficiently</li>
+                        <li class="mb-3">🔐 <strong>Role-Based Access:</strong> Admin and Employee roles</li>
+                        <li class="mb-3">📊 <strong>Dashboard:</strong> Visual overview of tasks and progress</li>
+                        <li class="mb-3">🔔 <strong>Status Tracking:</strong> Monitor task progress in real-time</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 bg-primary text-white">
+                <div class="card-body p-5 d-flex flex-column justify-content-center">
+                    <h3 class="card-title">🚀 Get Started</h3>
+                    <p class="card-text mt-3">Sign in to access your tasks and collaborate with your team.</p>
+                    <div class="mt-4">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-light btn-lg me-2 mb-2">Login</a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg mb-2">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

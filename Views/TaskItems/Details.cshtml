@@ -1,0 +1,118 @@
+@model TaskItem
+
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">📄 Task Details</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Title:</dt>
+                    <dd class="col-sm-9">@Model.Title</dd>
+                    
+                    <dt class="col-sm-3">Description:</dt>
+                    <dd class="col-sm-9">@Model.Description</dd>
+                    
+                    <dt class="col-sm-3">Assigned To:</dt>
+                    <dd class="col-sm-9">
+                        <strong>@Model.AssignedTo?.FullName</strong>
+                        <br><small class="text-muted">@Model.AssignedTo?.Position</small>
+                        <br><small class="text-muted">@Model.AssignedTo?.Email</small>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Status:</dt>
+                    <dd class="col-sm-9">
+                        @{
+                            var statusClass = Model.Status switch
+                            {
+                                TaskItemStatus.NotStarted => "status-notstarted",
+                                TaskItemStatus.InProgress => "status-inprogress",
+                                TaskItemStatus.UnderReview => "status-underreview",
+                                TaskItemStatus.Completed => "status-completed",
+                                _ => "status-notstarted"
+                            };
+                        }
+                        <span class="status-badge @statusClass">@Model.Status.ToString().Replace("NotStarted", "Not Started").Replace("InProgress", "In Progress").Replace("UnderReview", "Under Review")</span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Priority:</dt>
+                    <dd class="col-sm-9">
+                        @{
+                            var priorityClass = Model.Priority switch
+                            {
+                                TaskPriority.Low => "priority-low",
+                                TaskPriority.Medium => "priority-medium",
+                                TaskPriority.High => "priority-high",
+                                TaskPriority.Critical => "priority-critical",
+                                _ => "priority-medium"
+                            };
+                        }
+                        <span class="priority-badge @priorityClass">@Model.Priority</span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Due Date:</dt>
+                    <dd class="col-sm-9">
+                        @Model.DueDate.ToString("MMMM dd, yyyy")
+                        @if (Model.IsOverdue)
+                        {
+                            <span class="badge bg-danger ms-2">Overdue</span>
+                        }
+                    </dd>
+                    
+                    <dt class="col-sm-3">Progress:</dt>
+                    <dd class="col-sm-9">
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar @(Model.ProgressPercentage == 100 ? "bg-success" : "bg-info")" role="progressbar" 
+                                 style="width: @Model.ProgressPercentage%" 
+                                 aria-valuenow="@Model.ProgressPercentage" aria-valuemin="0" aria-valuemax="100">
+                                <strong>@Model.ProgressPercentage%</strong>
+                            </div>
+                        </div>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Created Date:</dt>
+                    <dd class="col-sm-9">@Model.CreatedDate.ToString("MMMM dd, yyyy hh:mm tt")</dd>
+                    
+                    <dt class="col-sm-3">Last Updated:</dt>
+                    <dd class="col-sm-9">@Model.LastUpdated.ToString("MMMM dd, yyyy hh:mm tt")</dd>
+                    
+                    @if (Model.CompletedDate.HasValue)
+                    {
+                        <dt class="col-sm-3">Completed Date:</dt>
+                        <dd class="col-sm-9">
+                            <span class="text-success">✓ @Model.CompletedDate.Value.ToString("MMMM dd, yyyy hh:mm tt")</span>
+                        </dd>
+                    }
+                    
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <dt class="col-sm-3">Notes:</dt>
+                        <dd class="col-sm-9">
+                            <div class="alert alert-secondary mb-0">
+                                @Model.Notes
+                            </div>
+                        </dd>
+                    }
+                </dl>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,152 @@
+@model TaskItem
+
+@{
+    ViewData["Title"] = "Edit Task";
+    var isAdmin = ViewBag.IsAdmin ?? false;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <h3 class="mb-0 text-white">
+                    <i class="fas fa-edit me-2"></i>Edit Task
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CreatedDate" />
+                    
+                    @if (isAdmin)
+                    {
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="Title" />
+                        <input type="hidden" asp-for="Description" />
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" value="@Model.Title" readonly />
+                            <small class="text-muted">You cannot edit the title</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="4" readonly>@Model.Description</textarea>
+                            <small class="text-muted">You cannot edit the description</small>
+                        </div>
+                    }
+                    
+                    @if (isAdmin)
+                    {
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AssignedToId" class="form-label">Assign To</label>
+                                <select asp-for="AssignedToId" class="form-select" asp-items="ViewBag.AssignedToId"></select>
+                                <span asp-validation-for="AssignedToId" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DueDate" class="form-label"></label>
+                                <input asp-for="DueDate" class="form-control" type="date" />
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Priority" class="form-label"></label>
+                                <select asp-for="Priority" class="form-select">
+                                    <option value="0">Low</option>
+                                    <option value="1">Medium</option>
+                                    <option value="2">High</option>
+                                    <option value="3">Critical</option>
+                                </select>
+                                <span asp-validation-for="Priority" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label"></label>
+                                <select asp-for="Status" class="form-select">
+                                    <option value="0">Not Started</option>
+                                    <option value="1">In Progress</option>
+                                    <option value="2">Under Review</option>
+                                    <option value="3">Completed</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="Priority" />
+                        <input type="hidden" asp-for="DueDate" />
+                        <input type="hidden" asp-for="AssignedToId" />
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Priority</label>
+                                <input type="text" class="form-control" value="@Model.Priority" readonly />
+                                <small class="text-muted">Only admins can change priority</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Due Date</label>
+                                <input type="text" class="form-control" value="@Model.DueDate.ToString("MMM dd, yyyy")" readonly />
+                                <small class="text-muted">Only admins can change due date</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="0">Not Started</option>
+                                <option value="1">In Progress</option>
+                                <option value="2">Under Review</option>
+                                <option value="3">Completed</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                            <small class="text-muted">You can update the task status</small>
+                        </div>
+                    }
+                    
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label"></label>
+                        <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Add your notes here"></textarea>
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Info:</strong> @(isAdmin ? "As an admin, you can edit all fields." : "You can only update the status and notes.")
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

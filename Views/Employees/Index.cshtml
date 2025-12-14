@@ -1,0 +1,69 @@
+@model IEnumerable<Employee>
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>👥 Employees</h2>
+        <p class="text-muted">Manage your team members</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        ➕ Add New Employee
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Position</th>
+                <th>Role</th>
+                <th>Assigned Tasks</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.FullName</strong></td>
+                    <td>@item.Email</td>
+                    <td>@item.Position</td>
+                    <td>
+                        @if (item.Role == "Admin")
+                        {
+                            <span class="badge bg-danger">@item.Role</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-primary">@item.Role</span>
+                        }
+                    </td>
+                    <td><span class="badge bg-info">@item.AssignedTasks.Count</span> tasks</td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">📄</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">✏️</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">🗑️</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
