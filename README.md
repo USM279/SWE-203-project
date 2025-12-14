@@ -228,16 +228,6 @@ SWE-203-project/
 
 The application comes with pre-seeded accounts:
 
-### Administrator
-- **Email**: `admin@taskmanager.com`
-- **Password**: `admin123`
-- **Role**: Admin
-
-### Employee
-- **Email**: `obada.test@taskmanager.com`
-- **Password**: `Obada1234`
-- **Role**: Employee
-
 > **Note**: In production, passwords should be hashed using secure algorithms (BCrypt, Argon2, etc.)
 
 ## 📸 Screenshots
